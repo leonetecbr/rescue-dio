@@ -5,8 +5,12 @@ const START_DIVS = [
   '<div id="jogador" class="anima-1"></div>',
   '<div id="placar"></div>',
   '<div id="maior-pontuacao"></div>',
-  '<div id="energia"></div>'
+  '<div id="energia"></div>',
+  '<div id="som"></div>'
 ]
+
+const VOLUME_ON = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-volume-up-fill" viewBox="0 0 16 16"><path d="M11.536 14.01A8.473 8.473 0 0 0 14.026 8a8.473 8.473 0 0 0-2.49-6.01l-.708.707A7.476 7.476 0 0 1 13.025 8c0 2.071-.84 3.946-2.197 5.303l.708.707z" /><path d="M10.121 12.596A6.48 6.48 0 0 0 12.025 8a6.48 6.48 0 0 0-1.904-4.596l-.707.707A5.483 5.483 0 0 1 11.025 8a5.483 5.483 0 0 1-1.61 3.89l.706.706z" /><path d="M8.707 11.182A4.486 4.486 0 0 0 10.025 8a4.486 4.486 0 0 0-1.318-3.182L8 5.525A3.489 3.489 0 0 1 9.025 8 3.49 3.49 0 0 1 8 10.475l.707.707zM6.717 3.55A.5.5 0 0 1 7 4v8a.5.5 0 0 1-.812.39L3.825 10.5H1.5A.5.5 0 0 1 1 10V6a.5.5 0 0 1 .5-.5h2.325l2.363-1.89a.5.5 0 0 1 .529-.06z" /></svg>'
+const VOLUME_OFF = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-volume-mute-fill" viewBox="0 0 16 16"><path d="M6.717 3.55A.5.5 0 0 1 7 4v8a.5.5 0 0 1-.812.39L3.825 10.5H1.5A.5.5 0 0 1 1 10V6a.5.5 0 0 1 .5-.5h2.325l2.363-1.89a.5.5 0 0 1 .529-.06zm7.137 2.096a.5.5 0 0 1 0 .708L12.207 8l1.647 1.646a.5.5 0 0 1-.708.708L11.5 8.707l-1.646 1.647a.5.5 0 0 1-.708-.708L10.793 8 9.146 6.354a.5.5 0 1 1 .708-.708L11.5 7.293l1.646-1.647a.5.5 0 0 1 .708 0z" /></svg>'
 
 const TECLA = {
   W: 87,
@@ -36,14 +40,15 @@ function start() {
   fimdejogo = false
   energiaAtual = 3
   podeAtirar = true
-  highscore = localStorage.getItem('highscore')
-  if(!highscore) highscore = 0
+  highscore = Number(localStorage.getItem('highscore'))
   $('#maior-pontuacao').html(`<h2>Maiores pontos: ${highscore}</h2>`)
 
-  podeMusica = localStorage.getItem('music')
+  podeMusica =localStorage.getItem('music')
 
   if (podeMusica === undefined) podeMusica = true
+  else podeMusica = Boolean(podeMusica)
 
+  botaoMusica()
   iniciarMusica()
 
   $(document).keydown(function (e) {
@@ -54,6 +59,24 @@ function start() {
   $(document).keyup(function (e) {
     jogo.pressionou[e.which] = false
   })
+
+  function botaoMusica(){
+    if (podeMusica) $('#som').html(VOLUME_ON)
+    else $('#som').html(VOLUME_OFF)
+    
+    $('#som').on('click', () => {
+      podeMusica = !podeMusica
+      localStorage.setItem('music', podeMusica)
+      if (podeMusica){
+        $('#som').html(VOLUME_ON)
+        iniciarMusica()
+      }
+      else{
+        $('#som').html(VOLUME_OFF)
+        paraMusica()
+      }
+    })
+  }
 
   function loop() {
     moveFundo()
@@ -160,8 +183,21 @@ function start() {
 
   function iniciarMusica(){
     if (podeMusica){
-      musica.on('ended', () => musica.trigger('play'))
-      musica.trigger('play')
+      if (!fimdejogo){
+        musica.on('ended', () => musica.trigger('play'))
+        musica.trigger('play')
+      } else{
+        musica.trigger('pause')
+        somGameover.trigger('play')
+      }
+    }
+  }
+
+  function paraMusica(){
+    if (!fimdejogo) {
+      musica.trigger('pause')
+    } else {
+      somGameover.trigger('pause')
     }
   }
 
@@ -318,10 +354,7 @@ function start() {
 
   function gameOver() {
     fimdejogo = true
-    if (podeMusica){
-      musica.trigger('pause')
-      somGameover.trigger('play')
-    }
+    iniciarMusica()
 
     clearInterval(jogo.timer)
 
@@ -334,12 +367,13 @@ function start() {
 
     $('#fundo-game').append('<div id="fim"></div>')
 
-    $('#fim').html(`<h1> Game Over </h1><p>Sua pontuação foi: ${pontos}</p><div id="reinicia" onClick="reiniciaJogo()"><h3>Jogar Novamente</h3></div>`)
+    $('#fim').html(`<h1> Game Over </h1><p class="bolder">Sua pontuação foi: ${pontos} pontos</p><div id="reinicia" onClick="reiniciaJogo()"><h3>Jogar Novamente</h3></div>`)
   }
 }
 
 function reiniciaJogo() {
-  somGameover.trigger('pause')
+  if (podeMusica) somGameover.trigger('pause')
+  $('#som').remove()
   $('#fim').remove()
   $('#placar').remove()
   $('#energia').remove()

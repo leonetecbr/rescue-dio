@@ -6,24 +6,42 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Resgate</title>
   <link rel="stylesheet" href="css/style.css">
+  <link rel="manifest" href="manifest.json">
+  <link rel="shortcut icon" href="imgs/icons/128.png" type="image/png">
 </head>
 <body>
-  <div id="container">
+  <main>
+  <div id="container" class="d-none d-lg-block">
     <div id="fundo-game">
       <div id="inicio">
         <h1>Resgate</h1>
         <p>Utilize a tecla W para movimentar o helicóptero para cima, a tecla S para movimentar o helicóptero para baixo e
           a tecla D para atirar.</p>
-        <p onclick="start()">Clique aqui para iniciar!!</p>
+        <p onclick="start()" class="bolder">Clique aqui para iniciar!!</p>
       </div>
     </div>
   </div>
+  <article id="aviso" class="d-block d-lg-none">
+    <h2 class="text-center">Resgate não está disponível!</h2>
+    <p>Neste nomento o jogo resgate está disponével apenas para computadores com pelo menos 985 pixels de largura de tela, por isso não será possível jogá-lo neste momento.</p>
+    <h3>O que você pode fazer ?</h3>
+    <ul>
+      <li class="mb-3">Coloque a janela em tela cheia.</li>
+      <li class="mb-3">Verfique se seu computador atende os requisitos de tamanho da tela.</li>
+      <li>Acesse através de um computador.</li>
+    </ul> 
+  </article>
   <audio src="sons/som.mp3" preload="auto" id="somDisparo"></audio>
   <audio src="sons/explosao.mp3" preload="auto" id="somExplosao"></audio>
   <audio src="sons/musica_fundo.mp3" preload="auto" id="musica"></audio>
   <audio src="sons/gameover.mp3" preload="auto" id="somGameover"></audio>
   <audio src="sons/perdido.mp3" preload="auto" id="somPerdido"></audio>
   <audio src="sons/resgate.mp3" preload="auto" id="somResgate"></audio>
+  </main>
+  <hr>
+  <footer>
+    <span class="bolder">&copy; 2021 Leone Oliveira</span>. Todos os direitos reservados
+  </footer>
   <script src="js/jquery-1.11.1.min.js"></script>
   <script src="js/jquery-collision.min.js"></script>
   <script src="js/scrpts.js"></script>
